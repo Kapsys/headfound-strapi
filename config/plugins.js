@@ -3,9 +3,12 @@ function s3Config(env) {
     config: {
       provider: "aws-s3",
       providerOptions: {
+        baseUrl: `https://s3.${env("AWS_REGION")}.amazonaws.com/${env("AWS_BUCKET")}`,
         s3Options: {
-          accessKeyId: env("AWS_ACCESS_KEY_ID"),
-          secretAccessKey: env("AWS_ACCESS_SECRET"),
+          credentials: {
+            accessKeyId: env("AWS_ACCESS_KEY_ID"),
+            secretAccessKey: env("AWS_ACCESS_SECRET"),
+          },
           region: env("AWS_REGION"),
           params: {
             Bucket: env("AWS_BUCKET"),
@@ -34,22 +37,8 @@ module.exports = ({ env }) => ({
         jwtSecret: env('JWT_SECRET'),
       },
     },
-    graphql: {
-      enabled: true,
-      config: {
-        endpoint: '/graphql',
-        defaultLimit: 25,
-        maxLimit: 100,
-        apolloServer: {
-          tracing: true,
-        },
-      },
-    },
     upload: env("STORAGE", "s3") === "s3" ? s3Config(env) : localStorageConfig(env),
     seo: {
-      enabled: true
-    },
-    gatsby: {
       enabled: true
     },
     navigation: {
@@ -62,5 +51,10 @@ module.exports = ({ env }) => ({
         allowedFields: ['slug_category', 'uid'],
         excludedTypes: [],
       }
-    }
+    },
+    'strapi-plugin-populate-deep': {
+      config: {
+        defaultDepth: 5,
+      }
+    },
   });
